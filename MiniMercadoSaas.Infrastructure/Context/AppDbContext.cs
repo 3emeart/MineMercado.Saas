@@ -22,7 +22,7 @@ public class AppDbContext : DbContext
             .HasMany(c => c.Produtos)
             .WithOne(p => p.Categoria)
             .HasForeignKey(p => p.CategoriaId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<Produto>()
             .Property(c => c.Nome).HasMaxLength(50).IsRequired();

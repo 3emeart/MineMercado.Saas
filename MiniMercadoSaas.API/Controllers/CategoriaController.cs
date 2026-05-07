@@ -1,3 +1,4 @@
+using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniMercadoSaas.Application.DTO.Request;
@@ -65,11 +66,18 @@ public class CategoriaController : ControllerBase
         var deletarCategoria = await _context.Categorias.FindAsync(id);
         if (deletarCategoria is null)
             return NotFound("Categoria não encontrada");
-        
-        _context.Categorias.Remove(deletarCategoria);
-        
-        await _context.SaveChangesAsync();
-        return NoContent();
+
+        try
+        {
+            _context.Categorias.Remove(deletarCategoria);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        catch (DbUpdateException)
+        {
+            return BadRequest("Não é possível deletar esta categoria. A categoria tem produtos cadastrados");
+        }
+
 
     }
    
