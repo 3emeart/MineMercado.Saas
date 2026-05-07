@@ -1,0 +1,6 @@
+@MiniMercadoSaas.API_HostAddress = http://localhost:5290
+
+GET {{MiniMercadoSaas.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
