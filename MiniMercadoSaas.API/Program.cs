@@ -1,10 +1,33 @@
+using Microsoft.EntityFrameworkCore;
+using MiniMercadoSaas.Application.ServiceInterfaces;
+using MiniMercadoSaas.Application.Services;
+using MiniMercadoSaas.Domain;
+using MiniMercadoSaas.Infrastructure.Context;
+using MiniMercadoSaas.Infrastructure.Repositorys;
+using FluentValidation;
+using MiniMercadoSaas.Application.Validators;
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+var serverVersion = ServerVersion.AutoDetect(connectionString);
+
+
+
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connectionString, serverVersion));
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+builder.Services.AddScoped<IProductService, ProdutoService>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
+
+
 
 var app = builder.Build();
 
@@ -18,6 +41,8 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+
+app.MapControllers();
 
 
 

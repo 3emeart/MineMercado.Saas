@@ -9,7 +9,7 @@ using MiniMercadoSaas.Infrastructure.Context;
 namespace MiniMercadoSaas.API.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 public class CategoriaController : ControllerBase
 {
     
@@ -22,7 +22,7 @@ public class CategoriaController : ControllerBase
 
     [HttpGet]
     [ProducesResponseType(typeof(CategoriaResponse), StatusCodes.Status200OK)]
-    public async Task<ActionResult<List<Categoria>>> GetAll()
+    public async Task<ActionResult<IEnumerable<Categoria>>> GetAll()
     {
         var categorias = await _context.Categorias.ToListAsync();
         return Ok(categorias);
@@ -41,7 +41,7 @@ public class CategoriaController : ControllerBase
         return Ok(novaCategoria);
     }
 
-    [HttpPut("{Id}")]
+    [HttpPut("{id}")]
     public async Task<IActionResult> Edit(int id, [FromBody] CategoriaCreateRequest categoriaRequest)
     {
         var categoriaNoBanco = await _context.Categorias.FindAsync(id);
@@ -60,7 +60,7 @@ public class CategoriaController : ControllerBase
 
     }
 
-    [HttpDelete("{Id}")]
+    [HttpDelete("{id}")]
     public async Task<IActionResult> Delete(int id)
     {
         var deletarCategoria = await _context.Categorias.FindAsync(id);

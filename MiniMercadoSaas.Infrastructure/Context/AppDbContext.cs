@@ -31,6 +31,9 @@ public class AppDbContext : DbContext
             .Property(produto => produto.Codigo).HasMaxLength(25).IsRequired();
         
         modelBuilder.Entity<Produto>()
+            .HasIndex(produto => produto.Codigo).IsUnique();
+        
+        modelBuilder.Entity<Produto>()
             .Property(produto => produto.PrecoCompra ).HasColumnType("decimal(18,2)").IsRequired();
         
         modelBuilder.Entity<Produto>()

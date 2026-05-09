@@ -1,3 +1,5 @@
+using MiniMercadoSaas.Domain.Entities;
+
 namespace MiniMercadoSaas.Application.DTO.Response;
 
 public class CategoriaResponse
