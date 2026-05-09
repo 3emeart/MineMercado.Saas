@@ -22,13 +22,16 @@ public class AppDbContext : DbContext
             .HasMany(c => c.Produtos)
             .WithOne(p => p.Categoria)
             .HasForeignKey(p => p.CategoriaId)
-            .OnDelete(DeleteBehavior.Cascade);
+            .OnDelete(DeleteBehavior.Restrict);
         
         modelBuilder.Entity<Produto>()
             .Property(c => c.Nome).HasMaxLength(50).IsRequired();
         
         modelBuilder.Entity<Produto>()
             .Property(produto => produto.Codigo).HasMaxLength(25).IsRequired();
+        
+        modelBuilder.Entity<Produto>()
+            .HasIndex(produto => produto.Codigo).IsUnique();
         
         modelBuilder.Entity<Produto>()
             .Property(produto => produto.PrecoCompra ).HasColumnType("decimal(18,2)").IsRequired();
