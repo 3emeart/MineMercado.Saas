@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using MiniMercadoSaas.Application.DTO.Request;
 using MiniMercadoSaas.Application.DTO.Response;
+using MiniMercadoSaas.Application.ServiceInterfaces;
 using MiniMercadoSaas.Domain.Entities;
 using MiniMercadoSaas.Infrastructure.Context;
 
@@ -12,77 +13,58 @@ namespace MiniMercadoSaas.API.Controllers;
 [Route("api/v1/[controller]")]
 public class CategoriaController : ControllerBase
 {
-    
-    private readonly AppDbContext _context;
-    
-    public CategoriaController(AppDbContext context)
-    {
-        _context = context;
-    }
 
-    [HttpGet]
-    [ProducesResponseType(typeof(CategoriaResponse), StatusCodes.Status200OK)]
-    public async Task<ActionResult<IEnumerable<Categoria>>> GetAll()
+    private readonly ICategoryService _categoryService;
+
+    public CategoriaController(ICategoryService categoryService)
     {
-        var categorias = await _context.Categorias.ToListAsync();
-        return Ok(categorias);
+        _categoryService = categoryService;
     }
 
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CategoriaCreateRequest categoriaRequest)
+    public async Task<IActionResult> Criar(CategoriaCreateRequest request)
     {
-        var novaCategoria = new Categoria()
-        {
-            Nome = categoriaRequest.Nome,
-            Descricao = categoriaRequest.Descricao,
-        };
-        await _context.Categorias.AddAsync(novaCategoria);
-        await _context.SaveChangesAsync();
+        var novaCategoria = await _categoryService.CriarCategoria(request);
         return Ok(novaCategoria);
     }
 
+    [HttpGet]
+
+    public async Task<IActionResult> Get()
+    {
+        var categorias = await _categoryService.ListarCategorias();
+        return Ok(categorias);
+    }
+
+    [HttpGet("{nome}")]
+
+    public async Task<IActionResult> GetByName(string nome)
+    {
+        var categoriaName = await _categoryService.BuscarCategoriaPorNome(nome);
+        return Ok(categoriaName);
+    }
+
+    [HttpDelete]
+
+    public async Task<IActionResult> Deletar(int id)
+    {
+        await _categoryService.DeletarCategoria(id);
+        return Ok();
+    }
+
     [HttpPut("{id}")]
-    public async Task<IActionResult> Edit(int id, [FromBody] CategoriaCreateRequest categoriaRequest)
+
+    public async Task<IActionResult> Editar(int id,[FromBody] CategoriaCreateRequest request)
     {
-        var categoriaNoBanco = await _context.Categorias.FindAsync(id);
-        if (categoriaNoBanco is null)
-        {
-            return NotFound("Categoria não encontrada");
-        }
+        var categorias = await _categoryService.AtualizarCategoria(id, request);
+        return Ok(categorias);
         
-        categoriaNoBanco.Nome = categoriaRequest.Nome;
-        categoriaNoBanco.Descricao = categoriaRequest.Descricao;
         
-        await _context.SaveChangesAsync();
-        return Ok(categoriaNoBanco);
-
-
-
     }
 
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(int id)
-    {
-        var deletarCategoria = await _context.Categorias.FindAsync(id);
-        if (deletarCategoria is null)
-            return NotFound("Categoria não encontrada");
-
-        try
-        {
-            _context.Categorias.Remove(deletarCategoria);
-            await _context.SaveChangesAsync();
-            return NoContent();
-        }
-        catch (DbUpdateException)
-        {
-            return BadRequest("Não é possível deletar esta categoria. A categoria tem produtos cadastrados");
-        }
 
 
-    }
-   
-    
-    
+
 
 
 }

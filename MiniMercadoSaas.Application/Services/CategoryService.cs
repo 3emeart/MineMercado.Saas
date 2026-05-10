@@ -1,3 +1,4 @@
+using System.Globalization;
 using MiniMercadoSaas.Application.DTO.Request;
 using MiniMercadoSaas.Application.DTO.Response;
 using MiniMercadoSaas.Application.Validators;
@@ -29,7 +30,7 @@ public class CategoryService : ICategoryService
         }
 
         var novaCategoria = new Categoria()
-        {
+        {   
             Nome = request.Nome,
             Descricao = request.Descricao,
             DataCriacao = DateTime.UtcNow,
@@ -58,6 +59,8 @@ public class CategoryService : ICategoryService
         return new CategoriaResponse
         {
             Id = categoriaNome.Id,
+            Nome = categoriaNome.Nome,
+            Descricao = categoriaNome.Descricao,
 
         };
 
@@ -69,7 +72,7 @@ public class CategoryService : ICategoryService
         var categoriaEditar = await _categoryRepository.ObterCategoriaPorId(id);
         if (categoriaEditar == null)
         {
-            throw new Exception("Essa categoria não existe");
+            throw new CultureNotFoundException("Essa categoria não existe");
         }
         
         categoriaEditar.Id = id;
@@ -100,6 +103,20 @@ public class CategoryService : ICategoryService
         await _categoryRepository.DeleteAsync(id);
         
         
+    }
+
+    public async Task<IEnumerable<CategoriaResponse>> ListarCategorias()
+    {
+        var categorias = await _categoryRepository.ListarCategorias();
+        var listaCategorias = categorias.Select(categoria => new CategoriaResponse()
+        {
+            Id = categoria.Id,
+            Nome = categoria.Nome,
+            Descricao = categoria.Descricao,
+
+        });
+        
+        return listaCategorias;
     }
     
 

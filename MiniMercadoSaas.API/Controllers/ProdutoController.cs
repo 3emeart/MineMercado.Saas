@@ -30,8 +30,30 @@ public class ProdutoController : ControllerBase
        var novoProduto =  await _productService.Create(produtoRequest);
         return Ok(novoProduto);
     }
-    
-    
+
+    [HttpPut("{id}")]
+
+    public async Task<ActionResult<ProdutoResponse>> UpdateProduct(int id, ProdutoRequest produtoRequest)
+    {
+        var produto = await _productService.Update(id, produtoRequest);
+        return Ok(produto);
+    }
+
+    [HttpDelete("{id}")]
+
+    public async Task<ActionResult<ProdutoResponse>> DeleteProduct(int id)
+    {
+        await _productService.Delete(id);
+        return Ok($"Produto [{id}] deletado com sucesso ");
+    }
+
+    [HttpGet("{id}")]
+
+    public async Task<ActionResult<ProdutoResponse>> FindById(int id)
+    {
+        var produtos = await _productService.BuscarPorId(id);
+        return Ok(produtos);
+    }
     
     
 }

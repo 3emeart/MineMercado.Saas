@@ -24,6 +24,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 
 builder.Services.AddScoped<IProductService, ProdutoService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
 
