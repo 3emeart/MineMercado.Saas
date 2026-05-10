@@ -25,6 +25,7 @@ public class ProdutoService : IProductService
 
         var produtosLista = listaProdutos.Select(produto => new ProdutoResponse()
         {
+            Id = produto.Id,
             Nome = produto.Nome,
             Codigo = produto.Codigo,
             PrecoCompra = produto.PrecoCompra,

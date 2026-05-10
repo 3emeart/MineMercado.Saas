@@ -10,4 +10,7 @@ public interface ICategoryService
     Task<CategoriaResponse> CriarCategoria(CategoriaCreateRequest request);
     Task<CategoriaResponse> AtualizarCategoria(int id, CategoriaCreateRequest request);
     Task DeletarCategoria(int id);
+    
+    Task<IEnumerable<CategoriaResponse>> ListarCategorias();
+    
 }

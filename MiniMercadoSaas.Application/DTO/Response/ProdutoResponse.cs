@@ -10,5 +10,5 @@ public class ProdutoResponse
     public decimal PrecoCompra { get; set; }
     public decimal PrecoVenda { get; set; }
     public Produto.MedidaVenda MedidaVenda { get; set; }
-    
+    public int Id { get; set; }
 }
