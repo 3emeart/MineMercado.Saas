@@ -1,11 +1,6 @@
-using System.Linq.Expressions;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
 using MiniMercadoSaas.Application.DTO.Request;
-using MiniMercadoSaas.Application.DTO.Response;
 using MiniMercadoSaas.Application.ServiceInterfaces;
-using MiniMercadoSaas.Domain.Entities;
-using MiniMercadoSaas.Infrastructure.Context;
 
 namespace MiniMercadoSaas.API.Controllers;
 
@@ -25,7 +20,7 @@ public class CategoriaController : ControllerBase
     public async Task<IActionResult> Criar(CategoriaCreateRequest request)
     {
         var novaCategoria = await _categoryService.CriarCategoria(request);
-        return Ok(novaCategoria);
+        return Created($"api/v1/[controller]/{novaCategoria.Id}", novaCategoria);
     }
 
     [HttpGet]
@@ -44,7 +39,7 @@ public class CategoriaController : ControllerBase
         return Ok(categoriaName);
     }
 
-    [HttpDelete]
+    [HttpDelete("{id}")]
 
     public async Task<IActionResult> Deletar(int id)
     {

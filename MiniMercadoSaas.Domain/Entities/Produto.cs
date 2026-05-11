@@ -17,6 +17,6 @@ public class Produto
          Kg,
          
         }
-    public required Categoria Categoria { get; set; }
+    public required Categoria? Categoria { get; set; }
     public int CategoriaId { get; set; }
 }
