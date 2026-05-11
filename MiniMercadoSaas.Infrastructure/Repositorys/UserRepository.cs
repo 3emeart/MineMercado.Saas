@@ -1,0 +1,46 @@
+using Microsoft.EntityFrameworkCore;
+using MiniMercadoSaas.Domain.Entities;
+using MiniMercadoSaas.Domain.Interfaces;
+using MiniMercadoSaas.Infrastructure.Context;
+
+namespace MiniMercadoSaas.Infrastructure.Repositorys;
+
+public class UserRepository : IUsuarioRepository
+{
+    private readonly AppDbContext _dbContext;
+    
+    public UserRepository (AppDbContext dbContext)
+    {
+        _dbContext = dbContext;
+    }
+    
+    public async Task<User?> GetByEmailAsync(string email)
+    {
+        return await _dbContext.Users.FindAsync(email);
+        
+    }
+    
+    public async Task<User?> GetByIdAsync(Guid id)
+    {
+        return await _dbContext.Users.FindAsync(id);
+    }
+
+    public async Task AddAsync(User user)
+    {
+        await _dbContext.Users.AddAsync(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task UpdateAsync(User user)
+    {
+        _dbContext.Users.Update(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
+    public async Task<IEnumerable<User>> GetAllAsync()
+    {
+        return await _dbContext.Users.ToListAsync();
+    }
+
+    
+}

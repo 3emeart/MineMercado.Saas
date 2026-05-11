@@ -2,7 +2,6 @@ using FluentValidation;
 using MiniMercadoSaas.Application.DTO.Request;
 using MiniMercadoSaas.Application.DTO.Response;
 using MiniMercadoSaas.Application.ServiceInterfaces;
-using MiniMercadoSaas.Application.Validators;
 using MiniMercadoSaas.Domain;
 using MiniMercadoSaas.Domain.Entities;
 

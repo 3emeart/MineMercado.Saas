@@ -72,7 +72,7 @@ public class CategoryService : ICategoryService
         var categoriaEditar = await _categoryRepository.ObterCategoriaPorId(id);
         if (categoriaEditar == null)
         {
-            throw new CultureNotFoundException("Essa categoria não existe");
+            throw new KeyNotFoundException("Essa categoria não existe");
         }
         
         categoriaEditar.Id = id;
