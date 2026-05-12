@@ -25,7 +25,7 @@ public class AuthService : IAuthService
             throw new UnauthorizedAccessException("Credenciais Inválidas");
         }
 
-        if (BCrypt.Net.BCrypt.Verify(loginRequest.Password, usuario.SenhaHash))
+        if (!BCrypt.Net.BCrypt.Verify(loginRequest.Password, usuario.SenhaHash))
 
             throw new UnauthorizedAccessException("Credenciais Inválidas");
 
