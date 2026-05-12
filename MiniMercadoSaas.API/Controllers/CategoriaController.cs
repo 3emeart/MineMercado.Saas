@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using MiniMercadoSaas.Application.DTO.Request;
 using MiniMercadoSaas.Application.ServiceInterfaces;
@@ -15,14 +16,16 @@ public class CategoriaController : ControllerBase
     {
         _categoryService = categoryService;
     }
-
+    
+    [Authorize]
     [HttpPost]
     public async Task<IActionResult> Criar(CategoriaCreateRequest request)
     {
         var novaCategoria = await _categoryService.CriarCategoria(request);
         return Created($"api/v1/[controller]/{novaCategoria.Id}", novaCategoria);
     }
-
+    
+    [Authorize]
     [HttpGet]
 
     public async Task<IActionResult> Get()
@@ -30,7 +33,8 @@ public class CategoriaController : ControllerBase
         var categorias = await _categoryService.ListarCategorias();
         return Ok(categorias);
     }
-
+    
+    [Authorize]
     [HttpGet("{nome}")]
 
     public async Task<IActionResult> GetByName(string nome)
@@ -38,7 +42,8 @@ public class CategoriaController : ControllerBase
         var categoriaName = await _categoryService.BuscarCategoriaPorNome(nome);
         return Ok(categoriaName);
     }
-
+    
+    [Authorize]
     [HttpDelete("{id}")]
 
     public async Task<IActionResult> Deletar(int id)
@@ -46,7 +51,8 @@ public class CategoriaController : ControllerBase
         await _categoryService.DeletarCategoria(id);
         return Ok();
     }
-
+    
+    [Authorize]
     [HttpPut("{id}")]
 
     public async Task<IActionResult> Editar(int id,[FromBody] CategoriaCreateRequest request)
