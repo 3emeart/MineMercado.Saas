@@ -14,8 +14,6 @@ public class ProductValidator : AbstractValidator<ProdutoRequest>
 
         RuleFor(produto => produto.Nome)
             .NotEmpty().WithMessage("O nome do produto deve ser informado");
-        
-        
 
         RuleFor(produto => produto.PrecoVenda)
             .GreaterThan(produto => produto.PrecoCompra)
@@ -29,5 +27,8 @@ public class ProductValidator : AbstractValidator<ProdutoRequest>
         
         RuleFor(produto => produto.QuantidadeInicial)
             .GreaterThan(0).WithMessage("A quantidade deve ser maior que zero");
+        
+        
     } 
+    
 }

@@ -29,7 +29,7 @@ public class AppDbContext : DbContext
             .Property(c => c.Nome).HasMaxLength(50).IsRequired();
         
         modelBuilder.Entity<Produto>()
-            .Property(produto => produto.Codigo).HasMaxLength(25).IsRequired();
+            .Property(produto => produto.Codigo).HasMaxLength(13).IsRequired();
         
         modelBuilder.Entity<Produto>()
             .HasIndex(produto => produto.Codigo).IsUnique();
@@ -39,8 +39,18 @@ public class AppDbContext : DbContext
         
         modelBuilder.Entity<Produto>()
             .Property(produto => produto.PrecoVenda).HasColumnType("decimal(18,2)").IsRequired();
-            
         
+        modelBuilder.Entity<User>()
+            .HasIndex(user => user.Email).IsUnique();
+        
+        modelBuilder.Entity<User>()
+            .Property(user => user.Email).HasMaxLength(100).IsRequired();
+        
+        modelBuilder.Entity<User>()
+            .Property(user => user.Name).HasMaxLength(100).IsRequired();
+
+        modelBuilder.Entity<User>()
+            .Property(user => user.Role).HasConversion<string>().IsRequired();
     }
     
     

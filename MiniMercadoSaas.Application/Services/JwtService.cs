@@ -31,7 +31,7 @@ public class JwtService : IJwtService
             Subject = new ClaimsIdentity(new[]
             {
                 new Claim(JwtRegisteredClaimNames.Sub, usuario.Id.ToString()),
-                new Claim(JwtRegisteredClaimNames.Name, usuario.Name),
+                new Claim(JwtRegisteredClaimNames.Name, usuario.Name ),
                 new Claim(JwtRegisteredClaimNames.Email, usuario.Email),
                 new Claim(ClaimTypes.Role, usuario.Role.ToString()) 
             }),
