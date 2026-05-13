@@ -12,6 +12,8 @@ public class AppDbContext : DbContext
     public DbSet<Categoria> Categorias { get; set; }
     public DbSet<Produto> Produtos { get; set; }
     public DbSet<User> Users { get; set; }
+    
+    public DbSet<Venda> Vendas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,7 +53,31 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<User>()
             .Property(user => user.Role).HasConversion<string>().IsRequired();
+        
+        modelBuilder.Entity<Venda>()
+            .Property(venda => venda.TotalFinal).HasPrecision(18, 2);
+
+        modelBuilder.Entity<ItemVenda>()
+            .HasOne(itemVenda => itemVenda.Venda)
+            .WithMany(itemVenda => itemVenda.Itens)
+            .HasForeignKey(itemVenda => itemVenda.VendaId)
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        modelBuilder.Entity<ItemVenda>()
+            .HasOne(itemVenda => itemVenda.Produto)
+            .WithMany().HasForeignKey(itemVenda => itemVenda.ProdutoId)
+            .OnDelete(DeleteBehavior.Restrict);
+        
+        modelBuilder.Entity<ItemVenda>()
+            .Property(itemVenda => itemVenda.PrecoUnitario).HasPrecision(18, 2);
+        
+        modelBuilder.Entity<ItemVenda>()
+            .Property(venda => venda.SubTotal).HasPrecision(18, 2);
+        
+       
     }
+    
+    
     
     
     

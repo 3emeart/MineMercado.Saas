@@ -82,12 +82,16 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(connecti
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UserRepository>();
+builder.Services.AddScoped<IVendaRepository, VendaRepository>();
+
 
 builder.Services.AddScoped<IProductService, ProdutoService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IVendaService, VendaService>();
+
 
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
 
