@@ -2,7 +2,7 @@ using MiniMercadoSaas.Domain.Enums;
 
 namespace MiniMercadoSaas.Domain.Entities;
 
-public class Venda
+public class Venda  
 {
     public Guid Id { get; set; }
     public Guid OperadorId { get; set; }
@@ -15,5 +15,11 @@ public class Venda
     public DateTime? FinalizadaEm { get; set; } 
     public DateTime? CanceladaEm { get; set; }
     public ICollection<ItemVenda>? Itens { get; set; }
-    
+
+    public void AdicionarItem(ItemVenda itemFinal)
+    {
+        Itens.Add(itemFinal);
+        
+        TotalFinal = Itens.Sum(i => i.Subtotal);
+    }
 }

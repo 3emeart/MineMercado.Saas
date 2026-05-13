@@ -8,7 +8,8 @@ namespace MiniMercadoSaas.Infrastructure.Repositorys;
 public class VendaRepository : IVendaRepository
 {
     private readonly AppDbContext _dbContext;
-    
+    private IVendaRepository _vendaRepositoryImplementation;
+
     public VendaRepository(AppDbContext dbContext)
     {
         _dbContext = dbContext;
@@ -20,7 +21,7 @@ public class VendaRepository : IVendaRepository
 
         if (includeItens)
         {
-            query = query.Include(v => v.Itens)!
+            query = query.Include(v => v.Itens)
                 .ThenInclude(i => i.Produto);
 
         }
@@ -40,4 +41,6 @@ public class VendaRepository : IVendaRepository
          _dbContext.Update(venda);
         await _dbContext.SaveChangesAsync();
     }
+
+   
 }

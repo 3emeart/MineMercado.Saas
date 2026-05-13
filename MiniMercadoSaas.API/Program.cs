@@ -83,6 +83,7 @@ builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UserRepository>();
 builder.Services.AddScoped<IVendaRepository, VendaRepository>();
+builder.Services.AddScoped<IItemVendaRepository, ItemVendaRepository>();
 
 
 builder.Services.AddScoped<IProductService, ProdutoService>();
