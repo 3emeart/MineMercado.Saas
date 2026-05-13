@@ -14,6 +14,8 @@ public class AppDbContext : DbContext
     public DbSet<User> Users { get; set; }
     
     public DbSet<Venda> Vendas { get; set; }
+    
+    public DbSet<ItemVenda> ItemVendas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -72,7 +74,7 @@ public class AppDbContext : DbContext
             .Property(itemVenda => itemVenda.PrecoUnitario).HasPrecision(18, 2);
         
         modelBuilder.Entity<ItemVenda>()
-            .Property(venda => venda.SubTotal).HasPrecision(18, 2);
+            .Property(venda => venda.Subtotal).HasPrecision(18, 2);
         
        
     }
