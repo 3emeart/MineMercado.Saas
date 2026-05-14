@@ -19,9 +19,7 @@ public class EstoqueController : ControllerBase
         _estoqueService = estoqueService;
     }
 
-    /// <summary>
-    /// Registra uma entrada manual de estoque (somente Gerente/Admin)
-    /// </summary>
+    
     [Authorize(Roles = "Gerente,Admin")]
     [HttpPost("entrada")]
     public async Task<IActionResult> RegistrarEntrada([FromBody] EntradaEstoqueRequest request)
@@ -42,9 +40,7 @@ public class EstoqueController : ControllerBase
         }
     }
 
-    /// <summary>
-    /// Consulta o histórico de movimentações de estoque de um produto
-    /// </summary>
+    
     [HttpGet("movimentacoes/{produtoId:int}")]
     public async Task<IActionResult> ConsultarMovimentacoes(int produtoId)
     {
@@ -52,9 +48,7 @@ public class EstoqueController : ControllerBase
         return Ok(response);
     }
 
-    /// <summary>
-    /// Lista produtos com estoque abaixo do mínimo
-    /// </summary>
+    
     [HttpGet("baixo")]
     public async Task<IActionResult> ConsultarEstoqueBaixo()
     {

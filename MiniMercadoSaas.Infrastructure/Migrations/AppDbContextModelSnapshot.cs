@@ -63,7 +63,7 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
                     b.Property<int>("Quantidade")
                         .HasColumnType("int");
 
-                    b.Property<decimal>("SubTotal")
+                    b.Property<decimal>("Subtotal")
                         .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
@@ -76,7 +76,45 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
 
                     b.HasIndex("VendaId");
 
-                    b.ToTable("ItemVenda");
+                    b.ToTable("ItemVendas");
+                });
+
+            modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.MovimentacaoEstoque", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTime>("CriadoEm")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Observacao")
+                        .HasMaxLength(500)
+                        .HasColumnType("varchar(500)");
+
+                    b.Property<int>("ProdutoId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("Quantidade")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Tipo")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<Guid>("UsuarioId")
+                        .HasColumnType("char(36)");
+
+                    b.Property<Guid?>("VendaId")
+                        .HasColumnType("char(36)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("ProdutoId");
+
+                    b.HasIndex("VendaId");
+
+                    b.ToTable("MovimentacoesEstoque");
                 });
 
             modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.Produto", b =>
@@ -100,6 +138,9 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
 
                     b.Property<DateTime>("DataCadastro")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<int>("EstoqueMinimo")
+                        .HasColumnType("int");
 
                     b.Property<string>("Nome")
                         .IsRequired()
@@ -181,8 +222,9 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
                     b.Property<DateTime?>("FinalizadaEm")
                         .HasColumnType("datetime(6)");
 
-                    b.Property<int>("FormaPagamento")
-                        .HasColumnType("int");
+                    b.Property<string>("FormaPagamento")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<string>("MotivoCancelamento")
                         .HasColumnType("longtext");
@@ -193,8 +235,9 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
                     b.Property<Guid>("OperadorId")
                         .HasColumnType("char(36)");
 
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
+                    b.Property<string>("Status")
+                        .IsRequired()
+                        .HasColumnType("longtext");
 
                     b.Property<decimal>("TotalFinal")
                         .HasPrecision(18, 2)
@@ -224,6 +267,24 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
                     b.Navigation("Venda");
                 });
 
+            modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.MovimentacaoEstoque", b =>
+                {
+                    b.HasOne("MiniMercadoSaas.Domain.Entities.Produto", "Produto")
+                        .WithMany("Movimentacoes")
+                        .HasForeignKey("ProdutoId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("MiniMercadoSaas.Domain.Entities.Venda", "Venda")
+                        .WithMany()
+                        .HasForeignKey("VendaId")
+                        .OnDelete(DeleteBehavior.SetNull);
+
+                    b.Navigation("Produto");
+
+                    b.Navigation("Venda");
+                });
+
             modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.Produto", b =>
                 {
                     b.HasOne("MiniMercadoSaas.Domain.Entities.Categoria", "Categoria")
@@ -238,6 +299,11 @@ namespace MiniMercadoSaas.Infrastructure.Migrations
             modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.Categoria", b =>
                 {
                     b.Navigation("Produtos");
+                });
+
+            modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.Produto", b =>
+                {
+                    b.Navigation("Movimentacoes");
                 });
 
             modelBuilder.Entity("MiniMercadoSaas.Domain.Entities.Venda", b =>

@@ -14,7 +14,7 @@ public class Venda
     public DateTime AbertaEm { get; set; } = DateTime.Today;
     public DateTime? FinalizadaEm { get; set; } 
     public DateTime? CanceladaEm { get; set; }
-    public ICollection<ItemVenda>? Itens { get; set; }
+    public ICollection<ItemVenda>? Itens { get; set; } = new List<ItemVenda>();
 
     public void AdicionarItem(ItemVenda itemFinal)
     {
