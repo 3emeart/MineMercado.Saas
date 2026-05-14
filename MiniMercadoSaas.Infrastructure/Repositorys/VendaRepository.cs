@@ -8,7 +8,6 @@ namespace MiniMercadoSaas.Infrastructure.Repositorys;
 public class VendaRepository : IVendaRepository
 {
     private readonly AppDbContext _dbContext;
-    private IVendaRepository _vendaRepositoryImplementation;
 
     public VendaRepository(AppDbContext dbContext)
     {

@@ -48,7 +48,7 @@ public class ProductRepository : IProductRepository
 
     public async Task<Produto?> FindByCodigo(string codigo)
     {
-        return await _context.Produtos.FindAsync(codigo); 
+        return await _context.Produtos.FirstOrDefaultAsync(p => p.Codigo == codigo); 
     }
 }
     

@@ -138,7 +138,7 @@ public class ProdutoService : IProductService
             throw new Exception("Produto not found");
         }
 
-        if (produto.Quantidade < 0)
+        if (produto.Quantidade > 0)
         {
             throw new Exception("Não é permitido deletar um produto que ainda possui unidades no estoque");
         }
