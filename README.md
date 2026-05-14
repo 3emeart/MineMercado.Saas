@@ -1,4 +1,4 @@
-# MiniMercado SaaS API 🛒
+# MiniMercado  API 🛒
 
 Uma API robusta para gerenciamento de PDV (Ponto de Venda) e controle de estoque, desenvolvida com foco em escalabilidade, desacoplamento e boas práticas de arquitetura.
 
