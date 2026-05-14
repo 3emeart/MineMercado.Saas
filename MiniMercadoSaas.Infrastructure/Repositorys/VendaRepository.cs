@@ -37,8 +37,21 @@ public class VendaRepository : IVendaRepository
 
     public async Task UpdateAsync(Venda venda)
     {
-         _dbContext.Update(venda);
-        await _dbContext.SaveChangesAsync();
+        var entry = _dbContext.Entry(venda);
+
+        if (entry.State == EntityState.Detached)
+        {
+            _dbContext.Vendas.Update(venda);
+        }
+
+        try 
+        {
+            await _dbContext.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            
+        }
     }
 
    

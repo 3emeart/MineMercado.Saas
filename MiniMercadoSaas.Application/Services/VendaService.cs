@@ -1,8 +1,10 @@
 using Exceptions;
+using MassTransit;
 using MiniMercadoSaas.Application.DTO.Request;
 using MiniMercadoSaas.Application.DTO.Response;
 using MiniMercadoSaas.Application.ServiceInterfaces;
 using MiniMercadoSaas.Domain;
+using MiniMercadoSaas.Domain.Contracts;
 using MiniMercadoSaas.Domain.Entities;
 using MiniMercadoSaas.Domain.Enums;
 using MiniMercadoSaas.Domain.Interfaces;
@@ -14,15 +16,21 @@ public class VendaService : IVendaService
        private readonly IVendaRepository _vendaRepository;
        private readonly IProductRepository _productRepository;
        private readonly IMovimentacaoEstoqueRepository _movimentacaoRepository;
+       private readonly IPublishEndpoint _publishEndpoint;
+       private readonly IItemVendaRepository _itemVendaRepository;
 
        public VendaService(
               IVendaRepository vendaRepository,
               IProductRepository productRepository,
-              IMovimentacaoEstoqueRepository movimentacaoRepository)
+              IMovimentacaoEstoqueRepository movimentacaoRepository,
+              IPublishEndpoint publishEndpoint,
+              IItemVendaRepository itemVendaRepository)
        {
               _vendaRepository = vendaRepository;
               _productRepository = productRepository;
               _movimentacaoRepository = movimentacaoRepository;
+              _publishEndpoint = publishEndpoint;
+              _itemVendaRepository = itemVendaRepository;
        }
 
        public async Task<VendaResponse> AbrirAsync(Guid OperadorId)
@@ -69,12 +77,20 @@ public class VendaService : IVendaService
                      throw new BusinessException("Estoque insuficiente");
               }
 
-              var itemFinal = new ItemVenda(produto.Id, request.Quantidade, produto.PrecoVenda);
+              var itemFinal = new ItemVenda(produto.Id, request.Quantidade, produto.PrecoVenda)
+              {
+                     VendaId = id
+              };
 
-              vendasExistentes.AdicionarItem(itemFinal);
-              
-              await _vendaRepository.UpdateAsync(vendasExistentes);
-              return vendasExistentes;
+              await _itemVendaRepository.AddAsync(itemFinal);
+
+              var vendaAtualizada = await _vendaRepository.GetByIdAsync(id, true)
+                     ?? throw new NotFoundException("Venda não encontrada após adicionar item");
+
+              vendaAtualizada.TotalFinal = vendaAtualizada.Itens!.Sum(i => i.Subtotal);
+              await _vendaRepository.UpdateAsync(vendaAtualizada);
+
+              return vendaAtualizada;
        }
 
        public async Task<Venda> RemoveItemAsync(Guid id, Guid itemId)
@@ -116,7 +132,6 @@ public class VendaService : IVendaService
                      throw new BusinessException("Não é possível finalizar uma venda sem itens");
               }
 
-              // Validar estoque de todos os itens antes de decrementar
               foreach (var item in venda.Itens)
               {
                      var produto = await _productRepository.FindByIdAsync(item.ProdutoId)
@@ -130,13 +145,21 @@ public class VendaService : IVendaService
                      }
               }
 
-              // Decrementar estoque e registrar movimentações
               foreach (var item in venda.Itens)
               {
-                     var produto = await _productRepository.FindByIdAsync(item.ProdutoId)!;
+                     var produto = await _productRepository.FindByIdAsync(item.ProdutoId);
 
                      produto!.Quantidade -= item.Quantidade;
                      await _productRepository.UpdateAsync(produto);
+
+                     if (produto.Quantidade <= produto.EstoqueMinimo)
+                     {
+                            await _publishEndpoint.Publish(new EstoqueBaixoEvent(
+                                   produto.Id,
+                                   produto.Nome,
+                                   produto.Quantidade,
+                                   produto.EstoqueMinimo));
+                     }
 
                      var movimentacao = new MovimentacaoEstoque
                      {
@@ -175,7 +198,6 @@ public class VendaService : IVendaService
                      throw new BusinessException("O motivo do cancelamento é obrigatório");
               }
 
-              // Se a venda já foi finalizada, repor estoque
               if (venda.Status == StatusVenda.Finalizado && venda.Itens != null)
               {
                      foreach (var item in venda.Itens)

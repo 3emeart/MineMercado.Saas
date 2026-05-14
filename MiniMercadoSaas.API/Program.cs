@@ -6,11 +6,13 @@ using MiniMercadoSaas.Domain;
 using MiniMercadoSaas.Infrastructure.Context;
 using MiniMercadoSaas.Infrastructure.Repositorys;
 using FluentValidation;
+using MassTransit;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using MiniMercadoSaas.Application.Validators;
 using MiniMercadoSaas.Domain.Interfaces;
+using MiniMercadoSaas.Infrastructure.Consumers;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -97,6 +99,20 @@ builder.Services.AddScoped<IEstoqueService, EstoqueService>();
 
 
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
+
+builder.Services.AddMassTransit(x =>
+{
+    
+    x.AddConsumer<EstoqueBaixoConsumer>();
+    x.UsingRabbitMq((context, cfg) =>
+    {
+        cfg.Host(new Uri("rabbitmq://localhost"), h =>
+        {
+            h.Username("guest");
+            h.Password("guest");
+        });
+    });
+});
 
 
 
