@@ -13,11 +13,16 @@ public class VendaService : IVendaService
 {
        private readonly IVendaRepository _vendaRepository;
        private readonly IProductRepository _productRepository;
+       private readonly IMovimentacaoEstoqueRepository _movimentacaoRepository;
 
-       public VendaService(IVendaRepository vendaRepository, IProductRepository productRepository)
+       public VendaService(
+              IVendaRepository vendaRepository,
+              IProductRepository productRepository,
+              IMovimentacaoEstoqueRepository movimentacaoRepository)
        {
               _vendaRepository = vendaRepository;
-              _productRepository = _productRepository;
+              _productRepository = productRepository;
+              _movimentacaoRepository = movimentacaoRepository;
        }
 
        public async Task<VendaResponse> AbrirAsync(Guid OperadorId)
@@ -28,29 +33,23 @@ public class VendaService : IVendaService
                      Status = StatusVenda.Aberta,
                      TotalFinal = 0,
                      AbertaEm = DateTime.UtcNow,
-
-
               };
 
               await _vendaRepository.AddAsync(venda);
 
               return new VendaResponse(
-
                      venda.Id,
                      venda.TotalFinal,
                      venda.AbertaEm,
                      venda.Status,
                      venda.OperadorId
               );
-
-
-
        }
 
        public async Task<Venda> AddItemAsync(Guid id, AddItemRequest request, Guid operadorId)
        {
               var vendasExistentes = await _vendaRepository.GetByIdAsync(id, true)
-                                     ?? throw new KeyNotFoundException("Venda não encontrada");
+                                    ?? throw new KeyNotFoundException("Venda não encontrada");
 
               if (vendasExistentes.Status != StatusVenda.Aberta)
               {
@@ -76,9 +75,145 @@ public class VendaService : IVendaService
               
               await _vendaRepository.UpdateAsync(vendasExistentes);
               return vendasExistentes;
-
        }
-       
-       
 
+       public async Task<Venda> RemoveItemAsync(Guid id, Guid itemId)
+       {
+              var venda = await _vendaRepository.GetByIdAsync(id, true)
+                          ?? throw new NotFoundException("Venda não encontrada");
+
+              if (venda.Status != StatusVenda.Aberta)
+              {
+                     throw new BusinessException("Esta venda não foi aberta");
+              }
+
+              var item = venda.Itens.FirstOrDefault(i => i.Id == itemId);
+              if (item == null)
+              {
+                     throw new NotFoundException("Este item nao pertence a essa venda");
+              }
+
+              venda.Itens.Remove(item);
+
+              venda.TotalFinal = venda.Itens.Sum(i => i.PrecoUnitario * i.Quantidade);
+
+              await _vendaRepository.UpdateAsync(venda);
+              return venda;
+       }
+
+       public async Task<VendaDetalheResponse> FinalizarAsync(Guid vendaId, FinalizarVendaRequest request, Guid operadorId)
+       {
+              var venda = await _vendaRepository.GetByIdAsync(vendaId, true)
+                          ?? throw new NotFoundException("Venda não encontrada");
+
+              if (venda.Status != StatusVenda.Aberta)
+              {
+                     throw new BusinessException("Somente vendas com status 'Aberta' podem ser finalizadas");
+              }
+
+              if (venda.Itens == null || !venda.Itens.Any())
+              {
+                     throw new BusinessException("Não é possível finalizar uma venda sem itens");
+              }
+
+              // Validar estoque de todos os itens antes de decrementar
+              foreach (var item in venda.Itens)
+              {
+                     var produto = await _productRepository.FindByIdAsync(item.ProdutoId)
+                                   ?? throw new NotFoundException($"Produto {item.ProdutoId} não encontrado");
+
+                     if (produto.Quantidade < item.Quantidade)
+                     {
+                            throw new BusinessException(
+                                   $"Estoque insuficiente para o produto '{produto.Nome}'. " +
+                                   $"Disponível: {produto.Quantidade}, Solicitado: {item.Quantidade}");
+                     }
+              }
+
+              // Decrementar estoque e registrar movimentações
+              foreach (var item in venda.Itens)
+              {
+                     var produto = await _productRepository.FindByIdAsync(item.ProdutoId)!;
+
+                     produto!.Quantidade -= item.Quantidade;
+                     await _productRepository.UpdateAsync(produto);
+
+                     var movimentacao = new MovimentacaoEstoque
+                     {
+                            ProdutoId = produto.Id,
+                            Quantidade = item.Quantidade,
+                            Tipo = TipoMovimentacao.SaidaVenda,
+                            VendaId = venda.Id,
+                            UsuarioId = operadorId,
+                            Observacao = $"Saída por venda #{venda.Id}"
+                     };
+
+                     await _movimentacaoRepository.AddAsync(movimentacao);
+              }
+
+              venda.Status = StatusVenda.Finalizado;
+              venda.FormaPagamento = request.FormaPagamento;
+              venda.FinalizadaEm = DateTime.UtcNow;
+
+              await _vendaRepository.UpdateAsync(venda);
+
+              return new VendaDetalheResponse(venda);
+       }
+
+       public async Task<VendaDetalheResponse> CancelarAsync(Guid vendaId, CancelarVendaRequest request, Guid gerenteId)
+       {
+              var venda = await _vendaRepository.GetByIdAsync(vendaId, true)
+                          ?? throw new NotFoundException("Venda não encontrada");
+
+              if (venda.Status == StatusVenda.Cancelado)
+              {
+                     throw new BusinessException("Esta venda já foi cancelada");
+              }
+
+              if (string.IsNullOrWhiteSpace(request.MotivoCancelamento))
+              {
+                     throw new BusinessException("O motivo do cancelamento é obrigatório");
+              }
+
+              // Se a venda já foi finalizada, repor estoque
+              if (venda.Status == StatusVenda.Finalizado && venda.Itens != null)
+              {
+                     foreach (var item in venda.Itens)
+                     {
+                            var produto = await _productRepository.FindByIdAsync(item.ProdutoId)
+                                          ?? throw new NotFoundException($"Produto {item.ProdutoId} não encontrado");
+
+                            produto.Quantidade += item.Quantidade;
+                            await _productRepository.UpdateAsync(produto);
+
+                            var movimentacao = new MovimentacaoEstoque
+                            {
+                                   ProdutoId = produto.Id,
+                                   Quantidade = item.Quantidade,
+                                   Tipo = TipoMovimentacao.DevolucaoCancelamento,
+                                   VendaId = venda.Id,
+                                   UsuarioId = gerenteId,
+                                   Observacao = $"Devolução por cancelamento da venda #{venda.Id}. Motivo: {request.MotivoCancelamento}"
+                            };
+
+                            await _movimentacaoRepository.AddAsync(movimentacao);
+                     }
+              }
+
+              venda.Status = StatusVenda.Cancelado;
+              venda.MotivoCancelamento = request.MotivoCancelamento;
+              venda.CanceladaEm = DateTime.UtcNow;
+
+              await _vendaRepository.UpdateAsync(venda);
+
+              return new VendaDetalheResponse(venda);
+       }
+
+       public async Task<VendaDetalheResponse> GetByIdAsync(Guid vendaId)
+       {
+              var venda = await _vendaRepository.GetByIdAsync(vendaId, true)
+                          ?? throw new NotFoundException("Venda não encontrada");
+
+              return new VendaDetalheResponse(venda);
+       }
 }

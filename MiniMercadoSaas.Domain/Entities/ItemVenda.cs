@@ -2,9 +2,15 @@ namespace MiniMercadoSaas.Domain.Entities;
 
 public class ItemVenda
 {
-    public ItemVenda(int produtoId, int requestQuantidade, decimal produtoPrecoVenda)
+    protected ItemVenda() { }
+
+    public ItemVenda(int produtoId, int quantidade, decimal precoUnitario)
     {
-        
+        Id = Guid.NewGuid();
+        ProdutoId = produtoId;
+        Quantidade = quantidade;
+        PrecoUnitario = precoUnitario;
+        Subtotal = quantidade * precoUnitario;
     }
 
     public Guid Id { get; set; }
@@ -15,5 +21,4 @@ public class ItemVenda
     public int Quantidade { get; set; }
     public decimal PrecoUnitario { get; set; }
     public decimal Subtotal { get; set; }
-    
 }

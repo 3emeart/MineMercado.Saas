@@ -84,6 +84,7 @@ builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IUsuarioRepository, UserRepository>();
 builder.Services.AddScoped<IVendaRepository, VendaRepository>();
 builder.Services.AddScoped<IItemVendaRepository, ItemVendaRepository>();
+builder.Services.AddScoped<IMovimentacaoEstoqueRepository, MovimentacaoEstoqueRepository>();
 
 
 builder.Services.AddScoped<IProductService, ProdutoService>();
@@ -92,6 +93,7 @@ builder.Services.AddScoped<IJwtService, JwtService>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVendaService, VendaService>();
+builder.Services.AddScoped<IEstoqueService, EstoqueService>();
 
 
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();

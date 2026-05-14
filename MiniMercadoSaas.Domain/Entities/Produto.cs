@@ -11,6 +11,7 @@ public class Produto
     public decimal PrecoVenda { get; set; }
     public decimal PrecoCompra { get; set; }
     public bool Ativo { get; set; } = true;
+    public int EstoqueMinimo { get; set; } = 5;
     public enum MedidaVenda 
         {
          Unidade,
@@ -19,4 +20,5 @@ public class Produto
         }
     public required Categoria? Categoria { get; set; }
     public int CategoriaId { get; set; }
+    public ICollection<MovimentacaoEstoque> Movimentacoes { get; set; } = new List<MovimentacaoEstoque>();
 }
