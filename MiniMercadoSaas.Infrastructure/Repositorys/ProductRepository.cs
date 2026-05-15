@@ -29,14 +29,11 @@ public class ProductRepository : IProductRepository
     public async Task AddAsync(Produto produto)
     {
         await _context.Produtos.AddAsync(produto);
-        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Produto produto)
     {
         _context.Produtos.Update(produto);
-        await _context.SaveChangesAsync();
-        
     }
 
     public async Task DeleteAsync(int id)

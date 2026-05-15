@@ -17,7 +17,6 @@ public class MovimentacaoEstoqueRepository : IMovimentacaoEstoqueRepository
     public async Task AddAsync(MovimentacaoEstoque movimentacao)
     {
         await _dbContext.MovimentacoesEstoque.AddAsync(movimentacao);
-        await _dbContext.SaveChangesAsync();
     }
 
     public async Task<IEnumerable<MovimentacaoEstoque>> GetByProdutoIdAsync(int produtoId)

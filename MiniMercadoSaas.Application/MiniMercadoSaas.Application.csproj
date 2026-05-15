@@ -9,6 +9,7 @@
     <ItemGroup>
       <ProjectReference Include="..\Exceptions\Exceptions.csproj" />
       <ProjectReference Include="..\MiniMercadoSaas.Domain\MiniMercadoSaas.Domain.csproj" />
+      <ProjectReference Include="..\MiniMercadoSaas.Infrastructure\MiniMercadoSaas.Infrastructure.csproj" />
     </ItemGroup>
 
     <ItemGroup>

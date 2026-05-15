@@ -31,13 +31,11 @@ public class CategoryRepository : ICategoryRepository
     public async Task AddAsync(Categoria categoria)
     {
         await _context.Categorias.AddAsync(categoria);
-        await _context.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Categoria categoria)
     {
         _context.Categorias.Update(categoria);
-        await _context.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(int id)
