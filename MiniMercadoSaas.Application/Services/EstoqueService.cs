@@ -13,11 +13,13 @@ public class EstoqueService : IEstoqueService
 {
     private readonly IProductRepository _productRepository;
     private readonly IMovimentacaoEstoqueRepository _movimentacaoRepository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public EstoqueService(IProductRepository productRepository, IMovimentacaoEstoqueRepository movimentacaoRepository)
+    public EstoqueService(IProductRepository productRepository, IMovimentacaoEstoqueRepository movimentacaoRepository, IUnitOfWork unitOfWork)
     {
         _productRepository = productRepository;
         _movimentacaoRepository = movimentacaoRepository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<MovimentacaoEstoqueResponse> RegistrarEntradaAsync(EntradaEstoqueRequest request, Guid usuarioId)
@@ -41,6 +43,7 @@ public class EstoqueService : IEstoqueService
         };
 
         await _movimentacaoRepository.AddAsync(movimentacao);
+        await _unitOfWork.CommitAsync();
 
         return new MovimentacaoEstoqueResponse
         {

@@ -32,7 +32,6 @@ public class VendaRepository : IVendaRepository
     public async Task AddAsync(Venda venda)
     {
         await _dbContext.Vendas.AddAsync(venda);
-        await _dbContext.SaveChangesAsync();
     }
 
     public async Task UpdateAsync(Venda venda)
@@ -46,13 +45,14 @@ public class VendaRepository : IVendaRepository
 
         try 
         {
-            await _dbContext.SaveChangesAsync();
         }
         catch (DbUpdateConcurrencyException)
         {
             
         }
     }
+
+   
 
    
 }

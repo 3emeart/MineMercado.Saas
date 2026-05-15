@@ -16,13 +16,11 @@ public class ItemVendaRepository : IItemVendaRepository
     public async Task AddAsync(ItemVenda item)
     {
         await _dbContext.AddAsync(item);
-        await _dbContext.SaveChangesAsync();
     }
 
     public async Task DeleteAsync(ItemVenda item)
     {
          _dbContext.Remove(item);
-        await _dbContext.SaveChangesAsync();
     }
     
 }

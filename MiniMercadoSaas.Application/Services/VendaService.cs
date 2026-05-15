@@ -18,19 +18,23 @@ public class VendaService : IVendaService
        private readonly IMovimentacaoEstoqueRepository _movimentacaoRepository;
        private readonly IPublishEndpoint _publishEndpoint;
        private readonly IItemVendaRepository _itemVendaRepository;
+       private readonly IUnitOfWork _unitOfWork;
 
        public VendaService(
               IVendaRepository vendaRepository,
               IProductRepository productRepository,
               IMovimentacaoEstoqueRepository movimentacaoRepository,
               IPublishEndpoint publishEndpoint,
-              IItemVendaRepository itemVendaRepository)
+              IItemVendaRepository itemVendaRepository,
+              IUnitOfWork unitOfWork)
        {
               _vendaRepository = vendaRepository;
               _productRepository = productRepository;
               _movimentacaoRepository = movimentacaoRepository;
               _publishEndpoint = publishEndpoint;
               _itemVendaRepository = itemVendaRepository;
+              _unitOfWork = unitOfWork;
+              
        }
 
        public async Task<VendaResponse> AbrirAsync(Guid OperadorId)
@@ -44,6 +48,7 @@ public class VendaService : IVendaService
               };
 
               await _vendaRepository.AddAsync(venda);
+              await _unitOfWork.CommitAsync();
 
               return new VendaResponse(
                      venda.Id,
@@ -88,7 +93,7 @@ public class VendaService : IVendaService
                      ?? throw new NotFoundException("Venda não encontrada após adicionar item");
 
               vendaAtualizada.TotalFinal = vendaAtualizada.Itens!.Sum(i => i.Subtotal);
-              await _vendaRepository.UpdateAsync(vendaAtualizada);
+              await _unitOfWork.CommitAsync();
 
               return vendaAtualizada;
        }
@@ -113,7 +118,7 @@ public class VendaService : IVendaService
 
               venda.TotalFinal = venda.Itens.Sum(i => i.PrecoUnitario * i.Quantidade);
 
-              await _vendaRepository.UpdateAsync(venda);
+              await _unitOfWork.CommitAsync();
               return venda;
        }
 
@@ -150,7 +155,6 @@ public class VendaService : IVendaService
                      var produto = await _productRepository.FindByIdAsync(item.ProdutoId);
 
                      produto!.Quantidade -= item.Quantidade;
-                     await _productRepository.UpdateAsync(produto);
 
                      if (produto.Quantidade <= produto.EstoqueMinimo)
                      {
@@ -178,7 +182,7 @@ public class VendaService : IVendaService
               venda.FormaPagamento = request.FormaPagamento;
               venda.FinalizadaEm = DateTime.UtcNow;
 
-              await _vendaRepository.UpdateAsync(venda);
+              await _unitOfWork.CommitAsync();
 
               return new VendaDetalheResponse(venda);
        }
@@ -206,7 +210,6 @@ public class VendaService : IVendaService
                                           ?? throw new NotFoundException($"Produto {item.ProdutoId} não encontrado");
 
                             produto.Quantidade += item.Quantidade;
-                            await _productRepository.UpdateAsync(produto);
 
                             var movimentacao = new MovimentacaoEstoque
                             {
@@ -226,7 +229,7 @@ public class VendaService : IVendaService
               venda.MotivoCancelamento = request.MotivoCancelamento;
               venda.CanceladaEm = DateTime.UtcNow;
 
-              await _vendaRepository.UpdateAsync(venda);
+              await _unitOfWork.CommitAsync();
 
               return new VendaDetalheResponse(venda);
        }

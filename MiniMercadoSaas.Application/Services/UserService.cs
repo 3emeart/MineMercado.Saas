@@ -8,10 +8,12 @@ namespace MiniMercadoSaas.Application.Services;
 public class UserService : IUserService
 {
     private readonly IUsuarioRepository _repository;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public UserService(IUsuarioRepository repository)
+    public UserService(IUsuarioRepository repository, IUnitOfWork unitOfWork)
     {
         _repository = repository;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<User> Create(UserCreateRequest request)
@@ -31,6 +33,8 @@ public class UserService : IUserService
         };
 
         await _repository.AddAsync(newUser);
+        await _unitOfWork.CommitAsync();
+
         return newUser;
 
 

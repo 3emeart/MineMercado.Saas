@@ -4,6 +4,7 @@ using MiniMercadoSaas.Application.DTO.Response;
 using MiniMercadoSaas.Application.ServiceInterfaces;
 using MiniMercadoSaas.Domain;
 using MiniMercadoSaas.Domain.Entities;
+using MiniMercadoSaas.Domain.Interfaces;
 
 namespace MiniMercadoSaas.Application.Services;
 
@@ -11,11 +12,13 @@ public class ProdutoService : IProductService
 {
     private readonly IProductRepository _productRepository;
     private readonly IValidator<ProdutoRequest> _requestValidator;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public ProdutoService(IProductRepository productRepository, IValidator<ProdutoRequest> validator)
+    public ProdutoService(IProductRepository productRepository, IValidator<ProdutoRequest> validator, IUnitOfWork unitOfWork)
     {
         _productRepository = productRepository;
         _requestValidator = validator;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<IEnumerable<ProdutoResponse>> BuscarTodos()
@@ -80,6 +83,8 @@ public class ProdutoService : IProductService
         };
 
         await _productRepository.AddAsync(novoProduto);
+        await _unitOfWork.CommitAsync();
+
         return new ProdutoResponse
         {
             Nome = novoProduto.Nome,
@@ -119,6 +124,8 @@ public class ProdutoService : IProductService
         produtoIsNull.Codigo = request.Codigo;
         
         await _productRepository.UpdateAsync(produtoIsNull);
+        await _unitOfWork.CommitAsync();
+
         return new ProdutoResponse
         {
             Nome = produtoIsNull.Nome,
@@ -144,6 +151,7 @@ public class ProdutoService : IProductService
         }
 
         await _productRepository.DeleteAsync(id);
+        await _unitOfWork.CommitAsync();
 
     }
 

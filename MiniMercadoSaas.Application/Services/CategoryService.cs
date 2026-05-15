@@ -6,6 +6,7 @@ using MiniMercadoSaas.Domain;
 using MiniMercadoSaas.Domain.Entities;
 using FluentValidation;
 using MiniMercadoSaas.Application.ServiceInterfaces;
+using MiniMercadoSaas.Domain.Interfaces;
 
 namespace MiniMercadoSaas.Application.Services;
 
@@ -13,11 +14,13 @@ public class CategoryService : ICategoryService
 {
     private readonly ICategoryRepository _categoryRepository;
     private readonly CategoryValidator _categoryValidator;
+    private readonly IUnitOfWork _unitOfWork;
 
-    public CategoryService(ICategoryRepository categoryRepository, CategoryValidator categoryValidator)
+    public CategoryService(ICategoryRepository categoryRepository, CategoryValidator categoryValidator, IUnitOfWork unitOfWork)
     {
         _categoryRepository = categoryRepository;
         _categoryValidator = categoryValidator;
+        _unitOfWork = unitOfWork;
     }
 
     public async Task<CategoriaResponse> CriarCategoria(CategoriaCreateRequest request)
@@ -38,6 +41,8 @@ public class CategoryService : ICategoryService
         };
 
         await _categoryRepository.AddAsync(novaCategoria);
+        await _unitOfWork.CommitAsync();
+
         return new CategoriaResponse()
         {
             Id = novaCategoria.Id,
@@ -81,6 +86,8 @@ public class CategoryService : ICategoryService
         categoriaEditar.DataCriacao = DateTime.UtcNow;
         
         await  _categoryRepository.UpdateAsync(categoriaEditar);
+        await _unitOfWork.CommitAsync();
+
         return new CategoriaResponse
         {
             Id = categoriaEditar.Id,
@@ -101,6 +108,7 @@ public class CategoryService : ICategoryService
         }
         
         await _categoryRepository.DeleteAsync(id);
+        await _unitOfWork.CommitAsync();
         
         
     }
