@@ -36,10 +36,19 @@ public class UserService : IUserService
         await _unitOfWork.CommitAsync();
 
         return newUser;
-
-
-
-
     }
 
+    public async Task<IEnumerable<User>> GetAllAsync()
+    {
+        return await _repository.GetAllAsync();
+    }
+
+    public async Task DeleteAsync(Guid id)
+    {
+        var user = await _repository.GetByIdAsync(id);
+        if (user == null) throw new Exception("Usuário não encontrado.");
+
+        await _repository.DeleteAsync(user);
+        await _unitOfWork.CommitAsync();
+    }
 }

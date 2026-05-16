@@ -23,7 +23,34 @@ public class UserController : ControllerBase
     public async Task<IActionResult> CreateUser([FromBody] UserCreateRequest request)
     {
         var novoUsuario = await _userService.Create(request);
-        return Ok(novoUsuario);
+        return Ok(ToResponse(novoUsuario));
     }
 
+    [HttpGet]
+    public async Task<IActionResult> GetAll()
+    {
+        var users = await _userService.GetAllAsync();
+        return Ok(users.Select(ToResponse));
+    }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> Delete(Guid id)
+    {
+        await _userService.DeleteAsync(id);
+        return NoContent();
+    }
+
+    private static object ToResponse(User user)
+    {
+        return new
+        {
+            user.Id,
+            user.Name,
+            user.Email,
+            user.Active,
+            user.Role,
+            user.CreatedIn,
+            user.UltimoLoginIn
+        };
+    }
 }

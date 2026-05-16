@@ -37,7 +37,7 @@ public class VendaService : IVendaService
               
        }
 
-       public async Task<VendaResponse> AbrirAsync(Guid OperadorId)
+       public async Task<VendaDetalheResponse> AbrirAsync(Guid OperadorId)
        {
               var venda = new Venda
               {
@@ -50,13 +50,7 @@ public class VendaService : IVendaService
               await _vendaRepository.AddAsync(venda);
               await _unitOfWork.CommitAsync();
 
-              return new VendaResponse(
-                     venda.Id,
-                     venda.TotalFinal,
-                     venda.AbertaEm,
-                     venda.Status,
-                     venda.OperadorId
-              );
+               return new VendaDetalheResponse(venda);
        }
 
        public async Task<Venda> AddItemAsync(Guid id, AddItemRequest request, Guid operadorId)

@@ -11,6 +11,8 @@ public class VendaDetalheResponse(Venda venda)
     public StatusVenda StatusVenda { get; set; } = venda.Status; 
     public decimal TotalFinal { get; set; } = venda.TotalFinal;
     public DateTime AbertaEm { get; set; } = venda.AbertaEm; 
+    public string? PixCopiaECola {get; set;} 
+    public string? PixQrCodebase64 {get; set;}
     
     
     public ICollection<ItemVendaResponse> Itens { get; set; } = venda.Itens.Select(i => new ItemVendaResponse 

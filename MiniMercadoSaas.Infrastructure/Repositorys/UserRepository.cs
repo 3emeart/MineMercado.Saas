@@ -35,6 +35,12 @@ public class UserRepository : IUsuarioRepository
         _dbContext.Users.Update(user);
     }
 
+    public Task DeleteAsync(User user)
+    {
+        _dbContext.Users.Remove(user);
+        return Task.CompletedTask;
+    }
+
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _dbContext.Users.ToListAsync();
