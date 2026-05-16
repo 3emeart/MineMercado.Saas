@@ -45,7 +45,6 @@ if (secretKey != null)
         });
 }
 
-
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(c =>
 {
@@ -97,6 +96,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IVendaService, VendaService>();
 builder.Services.AddScoped<IEstoqueService, EstoqueService>();
+builder.Services.AddScoped<IFinanceiroService, FinanceiroService>();
 
 
 builder.Services.AddValidatorsFromAssemblyContaining<ProductValidator>();
@@ -151,4 +151,3 @@ app.MapControllers();
 
 
 app.Run();
-

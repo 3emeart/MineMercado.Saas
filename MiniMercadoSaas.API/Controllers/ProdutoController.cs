@@ -40,11 +40,17 @@ public class ProdutoController : ControllerBase
     }
 
     [HttpDelete("{id}")]
-
-    public async Task<ActionResult<ProdutoResponse>> DeleteProduct(int id)
+    public async Task<ActionResult> DeleteProduct(int id)
     {
-        await _productService.Delete(id);
-        return Ok($"Produto [{id}] deletado com sucesso ");
+        try 
+        {
+            await _productService.Delete(id);
+            return Ok(new { message = $"Produto [{id}] deletado com sucesso" });
+        }
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
     [HttpGet("{id}")]

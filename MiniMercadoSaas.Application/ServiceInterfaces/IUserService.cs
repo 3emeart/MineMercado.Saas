@@ -5,5 +5,7 @@ namespace MiniMercadoSaas.Application.ServiceInterfaces;
 
 public interface IUserService
 {
-    Task <User> Create (UserCreateRequest request);
+    Task<User> Create(UserCreateRequest request);
+    Task<IEnumerable<User>> GetAllAsync();
+    Task DeleteAsync(Guid id);
 }

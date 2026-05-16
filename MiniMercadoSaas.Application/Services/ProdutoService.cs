@@ -32,8 +32,7 @@ public class ProdutoService : IProductService
             Codigo = produto.Codigo,
             PrecoCompra = produto.PrecoCompra,
             PrecoVenda = produto.PrecoVenda,
-            QuantidadeInicial = produto.Quantidade,
-
+            QuantidadeAtual = produto.Quantidade,
         });
       
             return produtosLista;
@@ -50,11 +49,12 @@ public class ProdutoService : IProductService
 
         return new ProdutoResponse
         {
+            Id = produtoPorId.Id,
             Nome = produtoPorId.Nome,
             Codigo = produtoPorId.Codigo,
             PrecoCompra = produtoPorId.PrecoCompra,
             PrecoVenda = produtoPorId.PrecoVenda,
-
+            QuantidadeAtual = produtoPorId.Quantidade,
         };
 
     }
@@ -87,11 +87,13 @@ public class ProdutoService : IProductService
 
         return new ProdutoResponse
         {
+            Id = novoProduto.Id,
             Nome = novoProduto.Nome,
             Codigo = novoProduto.Codigo,
             PrecoCompra = novoProduto.PrecoCompra,
             PrecoVenda = novoProduto.PrecoVenda,
-            QuantidadeInicial = novoProduto.Quantidade,
+            QuantidadeAtual = novoProduto.Quantidade,
+            
         };
 
 
@@ -128,11 +130,12 @@ public class ProdutoService : IProductService
 
         return new ProdutoResponse
         {
+            Id = produtoIsNull.Id,
             Nome = produtoIsNull.Nome,
             Codigo = produtoIsNull.Codigo,
             PrecoCompra = produtoIsNull.PrecoCompra,
             PrecoVenda = produtoIsNull.PrecoVenda,
-
+            QuantidadeAtual = produtoIsNull.Quantidade,
         };
 
     }
@@ -145,10 +148,12 @@ public class ProdutoService : IProductService
             throw new Exception("Produto not found");
         }
 
+        /*
         if (produto.Quantidade > 0)
         {
             throw new Exception("Não é permitido deletar um produto que ainda possui unidades no estoque");
         }
+        */
 
         await _productRepository.DeleteAsync(id);
         await _unitOfWork.CommitAsync();

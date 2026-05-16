@@ -5,11 +5,12 @@ using Exceptions;
 using MiniMercadoSaas.Application.DTO.Request;
 using MiniMercadoSaas.Application.DTO.Response;
 using MiniMercadoSaas.Application.ServiceInterfaces;
+using MiniMercadoSaas.Application.Services;
 using MiniMercadoSaas.Domain.Entities;
 using MiniMercadoSaas.Domain.Enums;
 
 [ApiController]
-[Route("api/[controller]")]
+[Route("api/v1/[controller]")]
 [Authorize]
 public class VendasController : ControllerBase
 {
@@ -21,7 +22,7 @@ public class VendasController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<ActionResult<VendaResponse>> PostAsync()
+    public async Task<ActionResult<VendaDetalheResponse>> PostAsync()
     {
         var identity = User.FindFirstValue(ClaimTypes.NameIdentifier);
 

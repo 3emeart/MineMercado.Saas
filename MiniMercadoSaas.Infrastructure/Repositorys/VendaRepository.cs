@@ -29,6 +29,23 @@ public class VendaRepository : IVendaRepository
 
     }
 
+    public async Task<IEnumerable<Venda>> ListarPorPeriodoAsync(DateTime inicio, DateTime fim, bool includeItens)
+    {
+        IQueryable<Venda> query = _dbContext.Vendas;
+
+        if (includeItens)
+        {
+            query = query.Include(v => v.Itens)
+                .ThenInclude(i => i.Produto);
+        }
+
+        return await query
+            .Where(v => ((v.FinalizadaEm ?? v.CanceladaEm) ?? v.AbertaEm) >= inicio
+                        && ((v.FinalizadaEm ?? v.CanceladaEm) ?? v.AbertaEm) <= fim)
+            .OrderByDescending(v => (v.FinalizadaEm ?? v.CanceladaEm) ?? v.AbertaEm)
+            .ToListAsync();
+    }
+
     public async Task AddAsync(Venda venda)
     {
         await _dbContext.Vendas.AddAsync(venda);
